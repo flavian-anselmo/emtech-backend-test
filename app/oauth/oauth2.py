@@ -29,13 +29,13 @@ def create_access_token (payload:dict):
 def verify_access_token(token:str, credential_exceptions):
     try:
         payload:dict = jwt.decode(token, SECRET_KEY, ALGORITHM)
-        customer_id:int = payload.get('customer_id')
+        user_id:int = payload.get('user_id')
         exp_date:datetime = payload.get("exp")
         if datetime.fromtimestamp(exp_date) < datetime.now():
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token Expired', headers={"WWW-Authenticate": "Bearer"})
-        if customer_id is None:
+        if user_id is None:
             raise credential_exceptions
-        token_data = schema.TokenPayLoad(customer_id = customer_id)   
+        token_data = schema.TokenPayLoad(user_id = user_id)   
         return token_data
     except JWTError:
         raise credential_exceptions    
@@ -49,5 +49,5 @@ def get_current_user_logged_in(db:session = Depends(get_db), access_token:str = 
         headers={"WWW-Authenticate": "Bearer"},
     )
     token = verify_access_token(token = access_token, credential_exceptions = credential_exception)
-    user = db.query(models.Customers).filter(models.Customers.customer_id  == token.customer_id).first()
+    user = db.query(models.Users).filter(models.Users.user_id  == token.user_id).first()
     return user

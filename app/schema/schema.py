@@ -1,39 +1,60 @@
-from pydantic import BaseModel, validator
-import re as regex 
+from pydantic import BaseModel
 from datetime import datetime
 
 
+class UserCreate(BaseModel):
+    username: str
+    full_name: str
+    password: str
+    role: str
 
-class TokenPayLoad(BaseModel):
-    customer_id:int
-class TokenResponse(BaseModel):
-    access_token:str
-    type:str
 
+class UserResponse(BaseModel):
+    user_id: int
+    username: str
+    full_name: str
+    role: str
+    created_at: datetime
 
-class CustomerCreate(BaseModel):
-    customer_name: str
-    phone_no:str
-    password:str
-
-    # validation 
-    @validator('password')
-    def validate_paswd(cls, password:str):
-        if len(password) < 8:
-            raise ValueError('password is weak, it should be 8 characters and above')
-        
-    @validator('phone_no')
-    def validate_phone_no(cls, phone_no:str):
-        pattern = r'^\+254\d{9}$'
-        if regex.match(pattern, phone_no):
-            return phone_no
-        raise ValueError('phone number should start with +254 format')
-        
-class CustomerResponse(BaseModel):
-    customer_id:int 
-    customer_name: str
-    phone_no:str
     class Config:
         orm_mode = True
 
 
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenPayload(BaseModel):
+    user_id: int
+
+
+
+class TaskCreate(BaseModel):
+    title: str
+    description: str
+    assigned_to: int
+
+class TaskResponse(BaseModel):
+    task_id: int
+    title: str
+    description: str
+    status: str
+    assigned_to: int
+    created_by: int
+
+    class Config:
+        orm_mode = True
+
+class TaskStatusUpdate(BaseModel):
+    status: str
+
+
+class TaskFileResponse(BaseModel):
+    id: int
+    filename: str
+    filepath: str
+    task_id: int
+
+    class Config:
+        orm_mode = True

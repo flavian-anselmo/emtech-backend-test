@@ -2,14 +2,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.database import Base, engine
-from app.routers import auth
+from app.routers import auth, supervisor, employee
 
 
 Base.metadata.create_all(bind=engine)
 
 app:FastAPI = FastAPI(
-    title= "FastApi BoilerPlate",
-    description=" Fastapi template",
+    title= "E&M Tech Backend Test",
+    description="E&M Tech Backend Test",
     version="0.0.1",
     license_info={
         "name": "Apache 2.0",
@@ -21,16 +21,16 @@ app:FastAPI = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "*",
-        'http://127.0.0.1:8000'
-        'https://savannah-api.azurewebsites.net'
-    ],
+        "*"    
+],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(auth.router)
+app.include_router(supervisor.router)
+app.include_router(employee.router)
 
 
 
