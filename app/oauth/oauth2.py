@@ -35,7 +35,7 @@ def verify_access_token(token:str, credential_exceptions):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token Expired', headers={"WWW-Authenticate": "Bearer"})
         if user_id is None:
             raise credential_exceptions
-        token_data = schema.TokenPayLoad(user_id = user_id)   
+        token_data = schema.TokenPayload(user_id = user_id)   
         return token_data
     except JWTError:
         raise credential_exceptions    

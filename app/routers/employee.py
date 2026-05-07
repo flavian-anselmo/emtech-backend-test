@@ -14,10 +14,7 @@ router = APIRouter(
 )
 
 @router.get("/tasks", response_model=List[schema.TaskResponse])
-def get_my_tasks(
-    db: session = Depends(get_db),
-    current_user = Depends(get_current_user_logged_in)
-):
+def get_my_tasks(db: session = Depends(get_db),current_user = Depends(get_current_user_logged_in)):
     if current_user.role != "EMPLOYEE":
         raise HTTPException(403, "Only employees allowed")
 
@@ -28,11 +25,7 @@ def get_my_tasks(
     return tasks
 
 @router.get("/tasks/{task_id}", response_model=schema.TaskResponse)
-def get_task(
-    task_id: int,
-    db: session = Depends(get_db),
-    current_user = Depends(get_current_user_logged_in)
-):
+def get_task(task_id: int,db: session = Depends(get_db),current_user = Depends(get_current_user_logged_in)):
     task = db.query(models.Tasks).filter(
         models.Tasks.task_id == task_id,
         models.Tasks.assigned_to == current_user.user_id
@@ -45,11 +38,7 @@ def get_task(
 
 
 @router.put("/tasks/{task_id}/progress")
-def update_progress(
-    task_id: int,
-    db: session = Depends(get_db),
-    current_user = Depends(get_current_user_logged_in)
-):
+def update_progress(task_id: int,db: session = Depends(get_db),current_user = Depends(get_current_user_logged_in)):
     task = db.query(models.Tasks).filter(
         models.Tasks.task_id == task_id,
         models.Tasks.assigned_to == current_user.user_id
@@ -60,7 +49,6 @@ def update_progress(
 
     old_status = task.status
 
-    # 🔥 controlled workflow
     if task.status == "ASSIGNED":
         task.status = "IN_PROGRESS"
 
@@ -73,7 +61,6 @@ def update_progress(
             "Invalid status transition"
         )
 
-    # 🧠 save history (VERY IMPORTANT for interview marks)
     history = models.TaskHistory(
         task_id=task.task_id,
         old_status=old_status,
@@ -90,11 +77,7 @@ def update_progress(
 
 
 @router.put("/tasks/{task_id}/complete")
-def mark_completed(
-    task_id: int,
-    db: session = Depends(get_db),
-    current_user = Depends(get_current_user_logged_in)
-):
+def mark_completed(task_id: int,db: session = Depends(get_db),current_user = Depends(get_current_user_logged_in)):
     task = db.query(models.Tasks).filter(
         models.Tasks.task_id == task_id,
         models.Tasks.assigned_to == current_user.user_id

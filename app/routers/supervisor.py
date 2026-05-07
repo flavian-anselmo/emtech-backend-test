@@ -7,6 +7,8 @@ from app.database.database import get_db
 from app.models import models
 from app.schema import schema
 from app.oauth.oauth2 import get_current_user_logged_in
+from app.utils import auth_utils
+
 
 
 router = APIRouter(
@@ -14,7 +16,11 @@ router = APIRouter(
     tags=["Supervisor Operations"]
 )
 
-@router.post("/employees", status_code=status.HTTP_201_CREATED, response_model=schema.UserResponse)
+@router.post(
+    "/employees",
+    status_code=status.HTTP_201_CREATED,
+    response_model=schema.UserResponse
+)
 def create_employee(
     employee: schema.UserCreate,
     db: session = Depends(get_db),
@@ -22,11 +28,17 @@ def create_employee(
 ):
 
     if current_user.role != "SUPERVISOR":
-        raise HTTPException(status_code=403, detail="Only supervisors can create employees")
+        raise HTTPException(
+            status_code=403,
+            detail="Only supervisors can create employees"
+        )
+
+    hashed_password = auth_utils.get_hashed_password(employee.password)
 
     new_employee = models.Users(
         username=employee.username,
-        password=employee.password,
+        full_name=employee.full_name,
+        password=hashed_password,
         role="EMPLOYEE"
     )
 
@@ -61,12 +73,7 @@ def create_task(
     return new_task
 
 @router.post("/tasks/{task_id}/files", status_code=status.HTTP_201_CREATED)
-def upload_task_file(
-    task_id: int,
-    file: UploadFile = File(...),
-    db: session = Depends(get_db),
-    current_user = Depends(get_current_user_logged_in)
-):
+def upload_task_file(task_id: int,file: UploadFile = File(...),db: session = Depends(get_db),current_user = Depends(get_current_user_logged_in)):
 
     if current_user.role != "SUPERVISOR":
         raise HTTPException(status_code=403)
@@ -95,10 +102,7 @@ def upload_task_file(
 
 
 @router.get("/tasks/review", response_model=List[schema.TaskResponse])
-def review_tasks(
-    db: session = Depends(get_db),
-    current_user = Depends(get_current_user_logged_in)
-):
+def review_tasks(db: session = Depends(get_db),current_user = Depends(get_current_user_logged_in)):
 
     if current_user.role != "SUPERVISOR":
         raise HTTPException(status_code=403)
@@ -111,11 +115,7 @@ def review_tasks(
 
 
 @router.patch("/tasks/{task_id}/close", response_model=schema.TaskResponse)
-def close_task(
-    task_id: int,
-    db: session = Depends(get_db),
-    current_user = Depends(get_current_user_logged_in)
-):
+def close_task(task_id: int,db: session = Depends(get_db),current_user = Depends(get_current_user_logged_in)):
 
     if current_user.role != "SUPERVISOR":
         raise HTTPException(status_code=403)
