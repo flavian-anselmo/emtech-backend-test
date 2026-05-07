@@ -1,0 +1,35 @@
+version: '3.3'
+
+services:
+
+  backend: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/usr/src/app:rw
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000   --reload
+    ports:
+      - 8000:8000
+
+    environment:
+      - DATABASE_HOST=
+      - DATABASE_PASSWORD=
+      - DATABASE_NAME=
+      - DATABASE_USERNAME=
+      - SECRET_KEY=
+      - ALGORITHM=HS256 
+     
+  
+  postgres:
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=
+    volumes:
+      - postgresql-db-volume:/var/lib/postgresql/data
+volumes:
+  postgresql-db-volume:

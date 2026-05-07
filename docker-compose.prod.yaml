@@ -1,0 +1,24 @@
+version: '3.3'
+
+services:
+
+  backend: 
+    image: savannahregistry.azurecr.io/savannah.test:latest
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/usr/src/app:rw
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000   --reload
+    ports:
+      - 8000:8000
+
+  postgres:
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=savannahtest123/
+      - POSTGRES_DB=savannah-db-prod
+    volumes:
+      - postgresql-db-volume-prod:/var/lib/postgresql/data
+volumes:
+  postgresql-db-volume-prod:

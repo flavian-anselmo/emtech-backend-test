@@ -1,0 +1,10 @@
+assets
+.github
+__pycache__
+README.md
+.git*
+infra.as.code
+.testing.env
+diagram.as.code
+.pytest_cache
+tests
