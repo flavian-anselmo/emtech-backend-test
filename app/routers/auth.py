@@ -44,7 +44,6 @@ def sign_in(user_creds: OAuth2PasswordRequestForm = Depends(),db: Session = Depe
     Login user
     """
 
-    # check user exists
     user = db.query(models.Users).filter(models.Users.username == user_creds.username).first()
 
     if not user:
@@ -53,13 +52,11 @@ def sign_in(user_creds: OAuth2PasswordRequestForm = Depends(),db: Session = Depe
             detail="User does not exist"
         )
 
-    # verify password
     if not auth_utils.verify_password(user_creds.password,user.password):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid password"
         )
-    # create token
     access_token = oauth2.create_access_token(
         payload={
             "user_id": user.user_id,

@@ -26,7 +26,6 @@ class Users(Base):
     # SUPERVISOR / EMPLOYEE
     role = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text("now()"))
-    # relationships
     assigned_tasks = relationship("Tasks", foreign_keys="Tasks.assigned_to",back_populates="employee")
     created_tasks = relationship("Tasks",foreign_keys="Tasks.created_by",back_populates="supervisor")
 
@@ -46,7 +45,6 @@ class Tasks(Base):
     created_by = Column(Integer,ForeignKey("users.user_id", ondelete="CASCADE"),nullable=False)
     created_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text("now()"))
     updated_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text("now()"),onupdate=text("now()"))
-    # relationships
     employee = relationship("Users",foreign_keys=[assigned_to],back_populates="assigned_tasks")
     supervisor = relationship("Users",foreign_keys=[created_by],back_populates="created_tasks")
     files = relationship("TaskFiles",back_populates="task",cascade="all, delete")
@@ -66,7 +64,6 @@ class TaskFiles(Base):
     filepath = Column(String, nullable=False)
     uploaded_by = Column(Integer,ForeignKey("users.user_id", ondelete="CASCADE"),nullable=False)
     created_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text("now()"))
-    # relationships
     task = relationship("Tasks",back_populates="files")
 
 
@@ -84,7 +81,6 @@ class TaskHistory(Base):
     comment = Column(Text)
     changed_by = Column(Integer,ForeignKey("users.user_id", ondelete="CASCADE"),nullable=False)
     changed_at = Column(TIMESTAMP(timezone=True),nullable=False,server_default=text("now()"))
-    # relationships
     task = relationship("Tasks",back_populates="history")
 
 
